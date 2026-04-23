@@ -1,0 +1,21 @@
+# dependencies
+node_modules/
+
+# build output
+dist/
+build/
+*.tsbuildinfo
+
+# vite cache
+.vite/
+
+# env — copy .env.example and fill in your key, never commit .env
+.env
+
+# OS
+.DS_Store
+
+# editors
+.vscode/
+.idea/
+*.swp
