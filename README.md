@@ -50,26 +50,36 @@ Browser (React)
 
 ---
 
-## Demo 2 — 2 SSE hops *(coming next)*
+## Demo 2 — explicit BFF pipe
 
 ```
 Browser (React)
-    │  POST /api/chat
+    │  POST /api/chat  { messages: [...] }
     ▼
-BFF Express Server :3002
-    │  receives SSE from OpenAI, immediately re-streams to browser
-    │  openai.chat.completions.create({ stream: true })
+BFF :3002                        ← demo2/bff/server.ts
+    │  fetch POST /api/chat
+    ▼
+AI Service :3003                 ← demo2/ai-service/server.ts
+    │  openai SDK, stream: true
     ▼
 OpenAI API
     │  SSE chunks
     ▼
-BFF Express Server :3002
-    │  re-writes each chunk as SSE to the browser connection
+AI Service :3003
+    │  SSE  { delta }            ← HOP 1: AI service → BFF
+    ▼
+BFF :3002
+    │  ★ auth, logging, filtering, enrichment
+    │  SSE  { delta }            ← HOP 2: BFF → browser
     ▼
 Browser (React)
+    reads via fetch + ReadableStream — identical to demo 1
 ```
 
-The interesting part: the BFF reads from one SSE stream and writes to another, acting as a transparent pipe. This pattern is used when the BFF needs to enrich, filter, or log tokens mid-flight.
+**Key files:**
+- [`demo2/ai-service/server.ts`](demo2/ai-service/server.ts) — owns the OpenAI connection, streams tokens as SSE; callers don't need to know about OpenAI
+- [`demo2/bff/server.ts`](demo2/bff/server.ts) — no OpenAI dependency; reads SSE from AI service, re-emits to browser; the injection point for auth/logging/filtering
+- [`demo2/client/src/App.tsx`](demo2/client/src/App.tsx) — intentionally near-identical to demo 1; the browser can't tell there's a BFF
 
 ---
 
@@ -105,6 +115,36 @@ On every request to the server, `messages` is mapped to `{ role, content }[]` �
 cp .env.example .env
 # add your OpenAI key to .env
 ```
+
+### Demo 2
+
+**Terminal 1 — AI service**
+```bash
+cd demo2/ai-service
+npm install
+npm run dev
+# → http://localhost:3003
+```
+
+**Terminal 2 — BFF**
+```bash
+cd demo2/bff
+npm install
+npm run dev
+# → http://localhost:3002
+```
+
+**Terminal 3 — client**
+```bash
+cd demo2/client
+npm install
+npm run dev
+# → http://localhost:5174
+```
+
+Open [http://localhost:5174](http://localhost:5174).
+
+---
 
 ### Demo 1
 
