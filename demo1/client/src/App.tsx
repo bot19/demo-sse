@@ -14,7 +14,7 @@ const storage = createStorage("demo1_conversations");
 export default function App() {
   // all chat conversations, persisted to localStorage
   const [conversations, setConversations] = useState<Conversation[]>(
-    storage.load,
+    storage.load
   );
 
   // id of the currently selected conversation
@@ -28,12 +28,12 @@ export default function App() {
 
   // ref to the bottom of the messages container
   const bottomRef = useRef<HTMLDivElement>(
-    null,
+    null
   ) as React.RefObject<HTMLDivElement>;
 
   // ref to the input field
   const inputRef = useRef<HTMLInputElement>(
-    null,
+    null
   ) as React.RefObject<HTMLInputElement>;
 
   // current active conversation
@@ -101,6 +101,8 @@ export default function App() {
       let content = "";
       await readSSEStream(response, (delta) => {
         content += delta;
+
+        // walks each convo, if matches current convo (snapshot), then update the messages with the new content, otherwise return the convo as is
         setConversations((prev) =>
           prev.map((c) =>
             c.id !== snapshot.id
@@ -109,10 +111,10 @@ export default function App() {
                   ...c,
                   updatedAt: Date.now(),
                   messages: c.messages.map((m) =>
-                    m.id !== assistantMsg.id ? m : { ...m, content },
+                    m.id !== assistantMsg.id ? m : { ...m, content }
                   ),
-                },
-          ),
+                }
+          )
         );
       });
     } catch (err) {
