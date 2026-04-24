@@ -1,6 +1,6 @@
-import type React from 'react';
+import type { CSSProperties } from 'react';
 
-const s: Record<string, React.CSSProperties> = {
+const s: Record<string, CSSProperties> = {
   shell:        { display: 'flex', height: '100vh', overflow: 'hidden' },
   sidebar:      { width: 240, flexShrink: 0, display: 'flex', flexDirection: 'column', borderRight: '1px solid #e0e0e0', background: '#fafafa' },
   sidebarHeader:{ padding: '12px 12px', borderBottom: '1px solid #e0e0e0' },

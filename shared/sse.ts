@@ -15,26 +15,21 @@ export async function readSSEStream(
     // A single read() call may contain multiple SSE events or a partial event.
     // Split on newlines and process each "data: ..." line individually.
     const text = decoder.decode(value, { stream: true });
-    for (const line of text.split("\n")) {
+    for (const line of text.split('\n')) {
       // skip non-data lines, eg: blank lines, comments, event-type, etc
-      if (!line.startsWith("data: ")) continue;
+      if (!line.startsWith('data: ')) continue;
 
       // remove the 'data: ' prefix, check for [DONE] = end of stream
       const payload = line.slice(6).trim();
-      if (payload === "[DONE]") return;
+      if (payload === '[DONE]') return;
 
       try {
-        const parsed = JSON.parse(payload) as {
-          delta?: string;
-          error?: string;
-        };
-
+        const parsed = JSON.parse(payload) as { delta?: string; error?: string };
         if (parsed.error) throw new Error(parsed.error);
-
         // delta = new chunk of text, send to the UI
         if (parsed.delta) onDelta(parsed.delta);
       } catch (e) {
-        if (e instanceof Error && e.message !== "Unexpected token") throw e;
+        if (e instanceof Error && e.message !== 'Unexpected token') throw e;
         // Partial JSON across chunk boundaries — safe to ignore, next chunk completes it.
       }
     }

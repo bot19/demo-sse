@@ -1,5 +1,5 @@
-import { useRef } from 'react';
-import type { Conversation, Message } from '@shared/types';
+import type { RefObject } from 'react';
+import type { Conversation, Message } from './types';
 import s from './styles';
 
 interface Props {
@@ -12,8 +12,8 @@ interface Props {
   onNewChat: () => void;
   onInputChange: (value: string) => void;
   onSend: () => void;
-  inputRef: React.RefObject<HTMLInputElement>;
-  bottomRef: React.RefObject<HTMLDivElement>;
+  inputRef: RefObject<HTMLInputElement>;
+  bottomRef: RefObject<HTMLDivElement>;
 }
 
 export default function ChatLayout({

@@ -10,7 +10,9 @@
     "noEmit": true,
     "baseUrl": ".",
     "paths": {
-      "@shared/*": ["../../shared/*"]
+      "@shared/*": ["../../shared/*"],
+      "react": ["./node_modules/@types/react"],
+      "react/jsx-runtime": ["./node_modules/@types/react/jsx-runtime"]
     }
   },
   "include": ["src", "vite.config.ts", "../../shared"]

@@ -1,20 +1,21 @@
 import { useState, useEffect, useRef } from "react";
 import type { Conversation } from "@shared/types";
 import {
-  loadConversations,
-  saveConversations,
+  createStorage,
   createConversation,
   createMessage,
-} from "./storage";
-import { readSSEStream } from "./sse";
-import ChatLayout from "./ChatLayout";
+} from "@shared/storage";
+import { readSSEStream } from "@shared/sse";
+import ChatLayout from "@shared/ChatLayout";
 
 const SERVER = "http://localhost:3001";
+const storage = createStorage("demo1_conversations");
 
 export default function App() {
   // all chat conversations, persisted to localStorage
-  const [conversations, setConversations] =
-    useState<Conversation[]>(loadConversations);
+  const [conversations, setConversations] = useState<Conversation[]>(
+    storage.load,
+  );
 
   // id of the currently selected conversation
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -40,7 +41,7 @@ export default function App() {
 
   // Persist to localStorage whenever conversations change.
   useEffect(() => {
-    saveConversations(conversations);
+    storage.save(conversations);
   }, [conversations]);
 
   // Scroll to bottom when a new message appears.
@@ -71,6 +72,7 @@ export default function App() {
 
     // Use the active conversation or start a fresh one.
     const base = active ?? createConversation(userMsg.content);
+
     const snapshot: Conversation = {
       ...base,
       messages: [...base.messages, userMsg, assistantMsg],
